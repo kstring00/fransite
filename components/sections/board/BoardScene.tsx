@@ -147,15 +147,13 @@ type PieceProps = {
   domain: Domain;
   mats: ReturnType<typeof useMaterials>;
   selected: boolean;
-  onHover: (letter: string | null) => void;
-  onTap: (letter: string) => void;
 };
 
 function pieceMaterial(finish: PieceFinish, mats: ReturnType<typeof useMaterials>) {
   return finish === "gold" ? mats.goldPiece : finish === "leopard" ? mats.leopardPiece : mats.marblePiece;
 }
 
-function Piece({ domain, mats, selected, onHover, onTap }: PieceProps) {
+function Piece({ domain, mats, selected }: PieceProps) {
   const group = useRef<THREE.Group>(null);
   const light = useRef<THREE.PointLight>(null);
   const geo = useMemo(() => {
@@ -195,38 +193,17 @@ function Piece({ domain, mats, selected, onHover, onTap }: PieceProps) {
     (mat.emissive as THREE.Color).setRGB(GOLD.r * e, GOLD.g * e, GOLD.b * e);
   });
 
-  const over = (e: ThreeEvent<PointerEvent>) => {
-    e.stopPropagation();
-    if (e.pointerType === "touch") return;
-    document.body.style.cursor = "pointer";
-    onHover(domain.letter);
-  };
-  const out = (e: ThreeEvent<PointerEvent>) => {
-    e.stopPropagation();
-    if (e.pointerType === "touch") return;
-    document.body.style.cursor = "";
-    onHover(null);
-  };
-  const click = (e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation();
-    onTap(domain.letter);
-  };
-
   const h = PIECE_HEIGHT[domain.piece];
   return (
-    <group ref={group} position={[x, TILE_TOP, z]} onPointerOver={over} onPointerOut={out} onClick={click}>
-      {/* Wide invisible hit target so hovering is forgiving. */}
-      <mesh position={[0, h / 2, 0]} visible={false}>
-        <cylinderGeometry args={[0.26, 0.26, h + 0.1, 12]} />
-        <meshBasicMaterial />
-      </mesh>
+    <>
+    <group ref={group} position={[x, TILE_TOP, z]}>
       {domain.piece === "knight" ? (
         <group rotation={[0, -0.55, 0]}>
-          <mesh geometry={geo.base!} material={mat} castShadow receiveShadow />
-          <mesh geometry={geo.main} material={mat} castShadow receiveShadow />
+          <mesh geometry={geo.base!} material={mat} castShadow receiveShadow raycast={() => null} />
+          <mesh geometry={geo.main} material={mat} castShadow receiveShadow raycast={() => null} />
         </group>
       ) : (
-        <mesh geometry={geo.main} material={mat} castShadow receiveShadow />
+        <mesh geometry={geo.main} material={mat} castShadow receiveShadow raycast={() => null} />
       )}
       {domain.piece === "queen" ? (
         <group>
@@ -270,6 +247,7 @@ function Piece({ domain, mats, selected, onHover, onTap }: PieceProps) {
       ) : null}
       <pointLight ref={light} position={[0.25, h + 0.35, 0.35]} color={GOLD_2} intensity={0} distance={1.6} decay={2} />
     </group>
+    </>
   );
 }
 
@@ -289,6 +267,56 @@ function Rig({ reduceMotion }: { reduceMotion: boolean }) {
   }, [camera, size]);
   void reduceMotion;
   return null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Hover plane: the whole board is one continuous hit surface. Squares  */
+/* are decided in board space with a dead band at the borders, so the   */
+/* threshold is identical on every square and edges never flicker.      */
+/* ------------------------------------------------------------------ */
+
+const BORDER_DEADBAND = 0.07;
+
+function HoverPlane({ boardRef, onHover, onTap }: { boardRef: React.RefObject<THREE.Group | null>; onHover: (letter: string | null) => void; onTap: (letter: string) => void }) {
+  const local = useMemo(() => new THREE.Vector3(), []);
+  const current = useRef<string | null>(null);
+
+  const cellAt = (e: ThreeEvent<PointerEvent | MouseEvent>, strict: boolean): string | null => {
+    const root = boardRef.current;
+    if (!root) return null;
+    local.copy(e.point);
+    root.worldToLocal(local);
+    const col = Math.round(local.x);
+    const row = Math.round(local.z);
+    if (col < -1 || col > 1 || row < -1 || row > 1) return null;
+    if (strict) {
+      // Inside the dead band next to a border? Keep whatever is selected.
+      const dx = Math.abs(local.x - col);
+      const dz = Math.abs(local.z - row);
+      if ((dx > 0.5 - BORDER_DEADBAND || dz > 0.5 - BORDER_DEADBAND) && current.current) return current.current;
+    }
+    return DOMAINS.find((d) => d.col - 1 === col && d.row - 1 === row)?.letter ?? null;
+  };
+
+  const move = (e: ThreeEvent<PointerEvent>) => {
+    if (e.pointerType === "touch") return;
+    const next = cellAt(e, true);
+    if (next === current.current) return;
+    current.current = next;
+    document.body.style.cursor = next ? "pointer" : "";
+    onHover(next);
+  };
+  const click = (e: ThreeEvent<MouseEvent>) => {
+    const letter = cellAt(e, false);
+    if (letter) onTap(letter);
+  };
+
+  return (
+    <mesh position={[0, TILE_TOP + 0.28, 0]} rotation={[-Math.PI / 2, 0, 0]} visible={false} onPointerMove={move} onClick={click}>
+      <planeGeometry args={[3.3, 3.3]} />
+      <meshBasicMaterial />
+    </mesh>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -319,7 +347,7 @@ function Projector({ selected, onProject, onReady }: Pick<BoardSceneProps, "sele
 /* Scene                                                                */
 /* ------------------------------------------------------------------ */
 
-function SceneContent(props: BoardSceneProps & { pointer: React.MutableRefObject<{ x: number; y: number; active: boolean }> }) {
+function SceneContent(props: BoardSceneProps & { pointer: React.MutableRefObject<{ x: number; y: number; active: boolean }>; boardRef: React.RefObject<THREE.Group | null> }) {
   const mats = useMaterials();
   const { gl } = useThree();
   useEffect(() => {
@@ -363,8 +391,9 @@ function SceneContent(props: BoardSceneProps & { pointer: React.MutableRefObject
         <Rig reduceMotion={props.reduceMotion} />
         <Tiles mats={mats} />
         {DOMAINS.map((d) => (
-          <Piece key={d.letter} domain={d} mats={mats} selected={props.selected === d.letter} onHover={props.onHover} onTap={props.onTap} />
+          <Piece key={d.letter} domain={d} mats={mats} selected={props.selected === d.letter} />
         ))}
+        <HoverPlane boardRef={props.boardRef} onHover={props.onHover} onTap={props.onTap} />
       </group>
       <ContactShadows position={[0, -0.035, 0]} opacity={0.55} scale={7} blur={2.4} far={1.6} color="#000000" frames={1} />
       <Projector selected={props.selected} onProject={props.onProject} onReady={props.onReady} />
@@ -377,22 +406,25 @@ function BoardRoot(props: BoardSceneProps & { pointer: React.MutableRefObject<{ 
   const root = useRef<THREE.Group>(null);
   const rot = useRef({ x: 0, y: 0 });
   const t = useRef(0);
+  const swayHeld = useRef(0);
   useFrame((_, dt) => {
     if (!root.current) return;
-    t.current += dt;
+    if (!props.selected) t.current += dt;
     const sway = props.reduceMotion ? 0 : Math.sin(t.current * 0.35) * 0.9;
+    swayHeld.current = sway;
     const px = props.pointer.current.active ? props.pointer.current.x : 0;
     const py = props.pointer.current.active ? props.pointer.current.y : 0;
-    const targetY = THREE.MathUtils.degToRad(-px * 4 - sway);
-    const targetX = THREE.MathUtils.degToRad(py * 2.5);
-    const k = 1 - Math.pow(0.02, dt);
+    // Gentle parallax with a slow follow, so square edges never race the cursor.
+    const targetY = THREE.MathUtils.degToRad(-px * 3 - sway);
+    const targetX = THREE.MathUtils.degToRad(py * 1.8);
+    const k = 1 - Math.pow(0.2, dt);
     rot.current.y += (targetY - rot.current.y) * k;
     rot.current.x += (targetX - rot.current.x) * k;
     root.current.rotation.set(rot.current.x, rot.current.y, 0);
   });
   return (
     <group ref={root}>
-      <SceneContent {...props} />
+      <SceneContent {...props} boardRef={root} />
     </group>
   );
 }
@@ -418,6 +450,7 @@ export function BoardScene(props: BoardSceneProps) {
         shadows
         frameloop={props.active ? "always" : "never"}
         camera={{ fov: 30, near: 0.1, far: 40, position: [0, 3.55, 4.7] }}
+        onCreated={(state) => state.setEvents({ filter: (hits) => hits.slice(0, 1) })}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping }}
         onPointerMissed={props.onMiss}
         style={{ background: "transparent" }}

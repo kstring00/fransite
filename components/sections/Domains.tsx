@@ -147,13 +147,23 @@ export function Domains() {
     closeTimer.current = window.setTimeout(() => {
       setSelected(null);
       setPinned(false);
-    }, 160);
+    }, 320);
   }, []);
 
+  // Switching from one piece to another waits a beat, so grazing a border
+  // between two squares does not flip the card back and forth.
+  const dwellTimer = useRef<number | null>(null);
   const onHover = useCallback(
     (letter: string | null) => {
-      if (letter) open(letter, false);
-      else if (!pinned) scheduleClose();
+      if (dwellTimer.current) {
+        window.clearTimeout(dwellTimer.current);
+        dwellTimer.current = null;
+      }
+      if (letter) {
+        clearClose();
+        if (!selectedRef.current || selectedRef.current === letter) open(letter, false);
+        else dwellTimer.current = window.setTimeout(() => open(letter, false), 110);
+      } else if (!pinned) scheduleClose();
     },
     [open, pinned, scheduleClose]
   );
@@ -245,7 +255,9 @@ export function Domains() {
               ref={boardRef}
               className={`domains__board ${ready ? "is-ready" : ""}`}
               data-card-side="right"
-              onPointerLeave={() => {
+              onPointerLeave={(e) => {
+                if (e.pointerType === "touch") return;
+                document.body.style.cursor = "";
                 if (!pinned) scheduleClose();
               }}
             >
