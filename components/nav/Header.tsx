@@ -106,7 +106,7 @@ export function Header() {
     <>
       <header className="site-header pointer-events-none fixed inset-x-0 top-0 z-[60] flex justify-center" data-floating={floating || undefined}>
         <div ref={barRef} className="site-bar pointer-events-auto relative flex w-full items-center justify-between border border-transparent">
-          <a href={`#${SECTION_IDS.hero}`} className="site-brand flex items-center gap-3 text-gold" aria-label="Everything Behavior with Chess, back to top">
+          <a href={`#${SECTION_IDS.hero}`} className="site-brand flex items-center gap-3 text-gold">
             <QueenMark size={28} className="shrink-0 drop-shadow-[0_2px_8px_rgba(201,162,75,0.35)]" />
             <span className="site-brand__full">
               <Wordmark variant="full" />
@@ -114,6 +114,7 @@ export function Header() {
             <span className="site-brand__short">
               <Wordmark variant="short" />
             </span>
+            <span className="sr-only">, back to top</span>
           </a>
 
           <nav className="site-links flex flex-1 justify-center px-6" aria-label="Primary">

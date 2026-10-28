@@ -1,0 +1,76 @@
+/* 5.2 How it works */
+.how-grid {
+  position: relative;
+  display: grid;
+  gap: 24px;
+}
+@media (min-width: 900px) {
+  .how-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px;
+    align-items: start;
+  }
+  .how-card[data-step="2"] { margin-top: 124px; }
+  .how-card[data-step="3"] { margin-top: 248px; }
+}
+.how-card {
+  position: relative;
+  z-index: 1;
+}
+.how-path {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.how-path__line {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+.how-path__dot {
+  fill: var(--gold-2);
+}
+.how-path__glint {
+  fill: var(--gold-2);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.how-path__glint.is-live {
+  animation: how-glint 3.2s var(--ease-out) infinite;
+}
+@keyframes how-glint {
+  0% { opacity: 0; transform: scale(0.6); }
+  40% { opacity: 0.55; transform: scale(1.4); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+.how-step-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.how-step-num::after {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: var(--gold-dim);
+}
+.how-objection {
+  position: relative;
+  max-width: 62ch;
+  padding-top: 28px;
+}
+.how-objection::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}

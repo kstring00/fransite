@@ -3,10 +3,21 @@ import { Fraunces, Pinyon_Script, Manrope, IBM_Plex_Mono } from "next/font/googl
 export const fraunces = Fraunces({
   subsets: ["latin"],
   weight: "variable",
-  style: ["normal", "italic"],
-  axes: ["opsz", "SOFT"],
+  style: ["normal"],
+  axes: ["opsz"],
   display: "swap",
   variable: "--font-fraunces",
+});
+
+/** Italic is only used for the one emphasis word per heading, so it is not preloaded. */
+export const frauncesItalic = Fraunces({
+  subsets: ["latin"],
+  weight: "variable",
+  style: ["italic"],
+  axes: ["opsz"],
+  display: "swap",
+  variable: "--font-fraunces-italic",
+  preload: false,
 });
 
 export const pinyon = Pinyon_Script({
@@ -32,4 +43,4 @@ export const plexMono = IBM_Plex_Mono({
   preload: false,
 });
 
-export const fontClassNames = [fraunces.variable, pinyon.variable, manrope.variable, plexMono.variable].join(" ");
+export const fontClassNames = [fraunces.variable, frauncesItalic.variable, pinyon.variable, manrope.variable, plexMono.variable].join(" ");

@@ -46,6 +46,7 @@
   --color-cream-2: var(--cream-2);
 
   --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-display-italic: var(--font-fraunces-italic), var(--font-fraunces), "Iowan Old Style", Georgia, serif;
   --font-script: var(--font-pinyon), "Snell Roundhand", cursive;
   --font-sans: var(--font-manrope), "Avenir Next", "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-plex-mono), "SFMono-Regular", Menlo, monospace;
@@ -134,7 +135,7 @@ h1, h2, h3, h4 {
   letter-spacing: -0.015em;
   line-height: 1.04;
   text-wrap: balance;
-  font-variation-settings: "opsz" 144, "SOFT" 30;
+  font-variation-settings: "opsz" 144;
 }
 
 p {
@@ -146,11 +147,14 @@ em, .em {
   font-weight: 350;
   color: var(--gold-2);
 }
+h1 em, h2 em, h3 em, h4 em, .font-display em, .h-display em, .h-section em, .h-card em {
+  font-family: var(--font-display-italic);
+}
 
 /* ------------------------------------------------------------------
    Type utilities
 ------------------------------------------------------------------- */
-.font-display { font-family: var(--font-display); font-variation-settings: "opsz" 144, "SOFT" 30; }
+.font-display { font-family: var(--font-display); font-variation-settings: "opsz" 144; }
 .font-script { font-family: var(--font-script); font-weight: 400; }
 .font-mono { font-family: var(--font-mono); }
 
@@ -562,8 +566,16 @@ html[data-hero-scrubbing="1"] .scroll-progress {
   letter-spacing: -0.02em;
   color: var(--cream);
   padding-block: 10px;
-  font-variation-settings: "opsz" 96, "SOFT" 30;
+  font-variation-settings: "opsz" 96;
 }
 .mobile-menu__link:hover { color: var(--gold-2); }
 
 html.scroll-locked, html.scroll-locked body { overflow: hidden; }
+
+/* ------------------------------------------------------------------
+   Tap targets: keep the visual rhythm, widen the hit area to 44px
+------------------------------------------------------------------- */
+.site-brand { min-height: 44px; padding-block: 6px; }
+.menu-toggle::before { content: ""; position: absolute; inset: -3px; border-radius: 999px; }
+.site-footer a { position: relative; display: inline-block; padding-block: 10px; margin-block: -10px; }
+.site-footer .footer-links a { padding-block: 10px; margin-block: -6px; }

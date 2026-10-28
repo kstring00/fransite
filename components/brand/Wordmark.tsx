@@ -24,13 +24,13 @@ export function Wordmark({ variant = "full", className = "", size = "nav" }: Pro
 
   if (variant === "short") {
     return (
-      <span className={`font-display whitespace-nowrap text-cream ${base} ${className}`} style={{ fontVariationSettings: '"opsz" 72, "SOFT" 30' }}>
+      <span className={`font-display whitespace-nowrap text-cream ${base} ${className}`} style={{ fontVariationSettings: '"opsz" 72' }}>
         {config.brandShort}
       </span>
     );
   }
   return (
-    <span className={`font-display inline-flex items-baseline whitespace-nowrap text-cream ${base} ${className}`} style={{ fontVariationSettings: '"opsz" 72, "SOFT" 30' }}>
+    <span className={`font-display inline-flex items-baseline whitespace-nowrap text-cream ${base} ${className}`} style={{ fontVariationSettings: '"opsz" 72' }}>
       <span>Everything Behavior</span>
       <span className={`font-script inline-block text-gold ${script}`} aria-hidden="true">
         with

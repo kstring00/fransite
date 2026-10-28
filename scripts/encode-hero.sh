@@ -20,5 +20,9 @@ ffmpeg -y -i "$SRC" -vf "scale=1280:720" -c:v libx264 -g 6 -keyint_min 6 \
 # Poster = the final frame (queen centered, fully lit), used as the LCP image
 # and as the complete fallback when the video is not available.
 if [ ! -f "$POSTER" ]; then
-  ffmpeg -y -sseof -0.05 -i "$SRC" -frames:v 1 -q:v 2 "$POSTER"
+  ffmpeg -y -sseof -0.05 -i "$SRC" -frames:v 1 -q:v 4 "$POSTER"
 fi
+
+# Portrait crop of the poster for phones (served through <picture>), so the
+# queen stays centred and the image stays a valid LCP candidate.
+convert "$POSTER" -crop 608x1080+656+0 +repage -quality 84 -strip public/brand/hero-poster-portrait.jpg
