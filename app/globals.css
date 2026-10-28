@@ -1,0 +1,569 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Everything Behavior with Chess, design tokens
+   Black marble, oxblood, brass. Gold stays rare.
+------------------------------------------------------------------- */
+:root {
+  --marble: #0b0a0a;
+  --marble-2: #16110f;
+  --oxblood: #5a0e12;
+  --oxblood-2: #7a1419;
+  --gold: #c9a24b;
+  --gold-2: #e6c77a;
+  --gold-dim: #8c6f2e;
+  --cream: #f2e8d5;
+  --cream-2: #d9cdb4;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-enter: 700ms;
+  --dur-hover: 240ms;
+
+  --glass-bg: rgba(22, 17, 15, 0.55);
+  --glass-border: rgba(201, 162, 75, 0.35);
+  --glass-highlight: inset 0 1px 0 rgba(242, 232, 213, 0.08);
+  --glass-radius: 20px;
+
+  --nav-h: 84px;
+  --pill-h: 60px;
+  --hero-safe-top: clamp(56px, 8vh, 88px);
+
+  --section-pad: 160px;
+  --gutter: 24px;
+  --content: 1120px;
+  --content-wide: 1280px;
+}
+
+@theme inline {
+  --color-marble: var(--marble);
+  --color-marble-2: var(--marble-2);
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-2: var(--oxblood-2);
+  --color-gold: var(--gold);
+  --color-gold-2: var(--gold-2);
+  --color-gold-dim: var(--gold-dim);
+  --color-cream: var(--cream);
+  --color-cream-2: var(--cream-2);
+
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-script: var(--font-pinyon), "Snell Roundhand", cursive;
+  --font-sans: var(--font-manrope), "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), "SFMono-Regular", Menlo, monospace;
+
+  --ease-out: var(--ease-out);
+  --radius-glass: var(--glass-radius);
+  --breakpoint-nav: 900px;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --section-pad: 96px;
+    --gutter: 20px;
+    --nav-h: 72px;
+    --pill-h: 56px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------- */
+html {
+  background: var(--marble);
+  color: var(--cream);
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--marble);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+/* Marble vein layer across the whole page, 7% opacity. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("/textures/marble-veins.webp");
+  background-size: 1024px 1024px;
+  opacity: 0.07;
+  mix-blend-mode: screen;
+}
+
+#__site {
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background: rgba(201, 162, 75, 0.35);
+  color: var(--cream);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.04;
+  text-wrap: balance;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+em, .em {
+  font-style: italic;
+  font-weight: 350;
+  color: var(--gold-2);
+}
+
+/* ------------------------------------------------------------------
+   Type utilities
+------------------------------------------------------------------- */
+.font-display { font-family: var(--font-display); font-variation-settings: "opsz" 144, "SOFT" 30; }
+.font-script { font-family: var(--font-script); font-weight: 400; }
+.font-mono { font-family: var(--font-mono); }
+
+.label-mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cream-2);
+}
+
+/* Section label: oxblood chip with the number, then the mono title. */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+.section-label__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 22px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background: var(--oxblood);
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  color: var(--cream);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+}
+.section-label__rule {
+  width: 40px;
+  height: 1px;
+  background: var(--oxblood-2);
+}
+
+.label-mono--gold { color: var(--gold); }
+.label-mono--cream { color: var(--cream-2); }
+
+.h-display {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 5.2vw, 68px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  color: var(--cream);
+}
+
+.h-section {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4.4vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  color: var(--cream);
+}
+
+.h-card {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 450;
+  color: var(--cream);
+}
+
+.lede {
+  font-size: clamp(17px, 1.3vw, 20px);
+  line-height: 1.6;
+  color: var(--cream-2);
+  max-width: 56ch;
+}
+
+.body-2 {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--cream-2);
+}
+
+/* ------------------------------------------------------------------
+   Layout
+------------------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: calc(var(--content) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.container--wide {
+  max-width: calc(var(--content-wide) + var(--gutter) * 2);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--section-pad);
+}
+
+/* ------------------------------------------------------------------
+   Surfaces: liquid glass with a solid fallback
+------------------------------------------------------------------- */
+.glass {
+  position: relative;
+  background: rgba(22, 17, 15, 0.92);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-highlight), 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+}
+
+.glass--flat {
+  box-shadow: var(--glass-highlight);
+}
+
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 75, 0.6), transparent);
+}
+
+/* ------------------------------------------------------------------
+   The one primary button: "Get the Study Set"
+------------------------------------------------------------------- */
+.btn-primary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  background: var(--oxblood);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: inset 0 1px 0 rgba(242, 232, 213, 0.12), 0 10px 30px rgba(90, 14, 18, 0.35);
+  transition:
+    background-color 200ms var(--ease-out),
+    color 200ms var(--ease-out),
+    border-color 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: var(--gold);
+  color: var(--marble);
+  border-color: var(--gold-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 12px 36px rgba(201, 162, 75, 0.28);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-primary--lg {
+  min-height: 56px;
+  padding: 0 32px;
+  font-size: 16px;
+}
+
+/* Slow gold shimmer crossing the button every 6 s (buy section only). */
+.btn-primary--shimmer::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(230, 199, 122, 0.55) 48%,
+    rgba(242, 232, 213, 0.75) 50%,
+    rgba(230, 199, 122, 0.55) 52%,
+    transparent 70%
+  );
+  transform: translateX(-130%);
+  animation: btn-shimmer 6s var(--ease-out) infinite;
+  pointer-events: none;
+}
+
+.btn-primary--shimmer:hover::after {
+  opacity: 0;
+}
+
+@keyframes btn-shimmer {
+  0% { transform: translateX(-130%); }
+  18% { transform: translateX(130%); }
+  100% { transform: translateX(130%); }
+}
+
+/* Secondary text link: gold hairline underline that draws itself. */
+.link-draw {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 2px;
+}
+
+.link-draw::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 250ms var(--ease-out);
+}
+
+.link-draw:hover::after,
+.link-draw:focus-visible::after,
+.link-draw.is-active::after {
+  transform: scaleX(1);
+}
+
+/* ------------------------------------------------------------------
+   Entrance choreography helpers (GSAP sets final values; these are
+   the pre-entrance states so nothing flashes before JS runs).
+------------------------------------------------------------------- */
+.js [data-enter] {
+  opacity: 0;
+  transform: translateY(28px);
+  will-change: transform, opacity;
+}
+
+.js [data-enter="left"] { transform: translateX(-36px); }
+.js [data-enter="right"] { transform: translateX(48px); }
+.js [data-enter="none"] { transform: none; }
+
+/* ------------------------------------------------------------------
+   Reduced motion: scrubs become posters, entrances become fades,
+   particles turn off.
+------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .js [data-enter] {
+    transform: none;
+  }
+  .btn-primary--shimmer::after {
+    display: none;
+  }
+  [data-particles] {
+    display: none !important;
+  }
+}
+
+/* Utility: visually hidden */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ------------------------------------------------------------------
+   Header
+------------------------------------------------------------------- */
+.site-bar {
+  height: var(--nav-h);
+  max-width: var(--bar-max, 100%);
+  padding-inline: 40px;
+  box-sizing: border-box;
+  -webkit-backdrop-filter: blur(var(--glass-blur, 0px)) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur, 0px)) saturate(140%);
+  will-change: transform, max-width, height;
+}
+
+.site-link {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--cream-2);
+  padding-block: 4px;
+  transition: color 200ms var(--ease-out);
+}
+.site-link:hover,
+.site-link.is-active { color: var(--cream); }
+
+.site-brand__short { display: none; }
+
+.menu-toggle {
+  display: none;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 162, 75, 0.45);
+  background: rgba(22, 17, 15, 0.55);
+  box-shadow: inset 0 1px 0 rgba(242, 232, 213, 0.08);
+  transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+.menu-toggle:hover { border-color: var(--gold); }
+.menu-toggle__line {
+  position: absolute;
+  left: 11px;
+  width: 18px;
+  height: 1px;
+  background: var(--gold);
+  transition: transform 300ms var(--ease-out), top 300ms var(--ease-out);
+}
+.menu-toggle__line:nth-child(1) { top: 16px; }
+.menu-toggle__line:nth-child(2) { top: 23px; }
+.menu-toggle.is-open .menu-toggle__line:nth-child(1) { top: 19.5px; transform: rotate(45deg); }
+.menu-toggle.is-open .menu-toggle__line:nth-child(2) { top: 19.5px; transform: rotate(-45deg); }
+
+@media (max-width: 899px) {
+  .site-links { display: none; }
+  .site-cta { display: none; }
+  .menu-toggle { display: block; }
+  .site-bar { padding-inline: 20px; }
+}
+
+/* Under 900 the wordmark reads "Chess" only once the bar is a pill. */
+@media (max-width: 899px) {
+  .site-header[data-floating] .site-brand__full,
+  .site-brand__full { display: none; }
+  .site-brand__short { display: inline; }
+}
+@media (min-width: 900px) and (max-width: 1180px) {
+  .site-links ul { gap: 16px; }
+  .site-link { font-size: 13px; }
+}
+
+.scroll-progress {
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold) 60%, var(--gold-2));
+  transition: box-shadow 500ms var(--ease-out);
+}
+html[data-hero-scrubbing="1"] .scroll-progress {
+  box-shadow: 0 0 10px 1px rgba(230, 199, 122, 0.65);
+}
+
+/* Mobile takeover */
+.mobile-menu {
+  background: var(--marble);
+  background-image: url("/textures/marble-veins.webp");
+  background-size: 1024px 1024px;
+  background-blend-mode: screen;
+}
+.mobile-menu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--marble);
+  opacity: 0.93;
+}
+.mobile-menu__leopard {
+  position: absolute;
+  right: -40px;
+  bottom: -40px;
+  width: 360px;
+  height: 360px;
+  background: url("/textures/leopard.webp") center / 240px 240px repeat;
+  opacity: 0.04;
+  -webkit-mask-image: radial-gradient(circle at 80% 80%, #000 20%, transparent 70%);
+  mask-image: radial-gradient(circle at 80% 80%, #000 20%, transparent 70%);
+  pointer-events: none;
+}
+.mobile-menu__queen {
+  position: absolute;
+  right: -30px;
+  top: 32%;
+  color: var(--gold);
+  opacity: 0.06;
+  pointer-events: none;
+}
+.mobile-menu__link {
+  display: flex;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+  padding-block: 10px;
+  font-variation-settings: "opsz" 96, "SOFT" 30;
+}
+.mobile-menu__link:hover { color: var(--gold-2); }
+
+html.scroll-locked, html.scroll-locked body { overflow: hidden; }
