@@ -53,9 +53,11 @@ export function Domains() {
   const [reduce, setReduce] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const selectedRef = useRef<string | null>(null);
+  const pinnedRef = useRef(false);
   useEffect(() => {
     selectedRef.current = selected;
-  }, [selected]);
+    pinnedRef.current = pinned;
+  }, [selected, pinned]);
 
   useReveal(sectionRef);
 
@@ -256,9 +258,9 @@ export function Domains() {
               className={`domains__board ${ready ? "is-ready" : ""}`}
               data-card-side="right"
               onPointerLeave={(e) => {
-                if (e.pointerType === "touch") return;
+                if (e.pointerType !== "mouse") return;
                 document.body.style.cursor = "";
-                if (!pinned) scheduleClose();
+                if (!pinnedRef.current) scheduleClose();
               }}
             >
               <GoldDust density={0.9} className="domains__dust" />
@@ -288,8 +290,8 @@ export function Domains() {
                 aria-label={current ? `Domain ${current.letter}` : undefined}
                 style={{ visibility: "hidden", opacity: 0 }}
                 onPointerEnter={clearClose}
-                onPointerLeave={() => {
-                  if (!pinned) scheduleClose();
+                onPointerLeave={(e) => {
+                  if (e.pointerType === "mouse" && !pinnedRef.current) scheduleClose();
                 }}
               >
                 {current ? (
@@ -332,11 +334,13 @@ export function Domains() {
                     type="button"
                     className={`domains__chip ${selected === d.letter ? "is-active" : ""}`}
                     aria-pressed={selected === d.letter}
-                    onClick={() => onTap(d.letter)}
+                    onClick={() => open(d.letter, true)}
                     onFocus={() => open(d.letter, true)}
-                    onMouseEnter={() => open(d.letter, false)}
-                    onMouseLeave={() => {
-                      if (!pinned) scheduleClose();
+                    onPointerEnter={(e) => {
+                      if (e.pointerType === "mouse" && !pinnedRef.current) open(d.letter, false);
+                    }}
+                    onPointerLeave={(e) => {
+                      if (e.pointerType === "mouse" && !pinnedRef.current) scheduleClose();
                     }}
                   >
                     <span className="domains__chip-letter">{d.letter}</span>
