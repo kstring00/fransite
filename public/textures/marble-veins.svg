@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Veins live on the iso-lines of fractal noise: luminance is moved into alpha,
+         then a table transfer keeps only a thin band around 0.5. -->
+    <filter id="veins" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0028 0.0046" numOctaves="4" seed="11" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.95  0 0 0 0 0.91  0 0 0 0 0.84  0.33 0.33 0.34 0 0" result="l"/>
+      <feComponentTransfer in="l" result="iso">
+        <feFuncA type="table" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 1 0.2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+      </feComponentTransfer>
+      <feGaussianBlur in="iso" stdDeviation="0.6"/>
+    </filter>
+    <filter id="fine" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="3" seed="3" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.9  0 0 0 0 0.78  0 0 0 0 0.48  0.33 0.33 0.34 0 0" result="l"/>
+      <feComponentTransfer in="l">
+        <feFuncA type="table" tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 1 0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+      </feComponentTransfer>
+      <feGaussianBlur stdDeviation="0.4"/>
+    </filter>
+    <filter id="cloud" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0018" numOctaves="2" seed="21" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.95  0 0 0 0 0.91  0 0 0 0 0.84  0.2 0.2 0.2 0 -0.08"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="#000" filter="url(#cloud)" opacity="0.1"/>
+  <rect width="1024" height="1024" fill="#000" filter="url(#veins)" opacity="0.95"/>
+  <rect width="1024" height="1024" fill="#000" filter="url(#fine)" opacity="0.5"/>
+</svg>
